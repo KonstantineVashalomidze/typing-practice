@@ -1,6 +1,6 @@
 package com.github.konstantinevashalomidze.domain;
 
-import com.github.konstantinevashalomidze.domain.exceptions.IllegalKeystrokeEventArgumentsException;
+import com.github.konstantinevashalomidze.domain.exceptions.IllegalKeystrokeEventArgumentException;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -52,7 +52,7 @@ final class KeystrokeEventTest {
     @Test
     void shouldThrowWhenInvalidEventArguments() {
         // Something that is not in allowed charset
-        assertThrows(IllegalKeystrokeEventArgumentsException.class, () -> new KeystrokeEvent(
+        assertThrows(IllegalKeystrokeEventArgumentException.class, () -> new KeystrokeEvent(
                 'ñ',
                 'ñ',
                 System.currentTimeMillis(),
@@ -62,7 +62,7 @@ final class KeystrokeEventTest {
         ));
 
         // Keydown is greater than keyup
-        assertThrows(IllegalKeystrokeEventArgumentsException.class, () -> new KeystrokeEvent(
+        assertThrows(IllegalKeystrokeEventArgumentException.class, () -> new KeystrokeEvent(
                 'i',
                 'i',
                 System.currentTimeMillis() + 10,
@@ -72,7 +72,7 @@ final class KeystrokeEventTest {
         ));
 
         // Event is backspace and typed event at the same time
-        assertThrows(IllegalKeystrokeEventArgumentsException.class, () -> new KeystrokeEvent(
+        assertThrows(IllegalKeystrokeEventArgumentException.class, () -> new KeystrokeEvent(
                 'i',
                 'i',
                 System.currentTimeMillis(),
@@ -81,7 +81,7 @@ final class KeystrokeEventTest {
                 0
         ));
 
-        assertThrows(IllegalKeystrokeEventArgumentsException.class, () -> new KeystrokeEvent(
+        assertThrows(IllegalKeystrokeEventArgumentException.class, () -> new KeystrokeEvent(
                 'i',
                 'i',
                 System.currentTimeMillis(),
