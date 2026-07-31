@@ -1,6 +1,6 @@
 package com.github.konstantinevashalomidze.domain;
 
-import com.github.konstantinevashalomidze.domain.exceptions.IllegalKeystrokeEventArgumentsException;
+import com.github.konstantinevashalomidze.domain.exceptions.IllegalKeystrokeEventArgumentException;
 
 public record KeystrokeEvent(
         char typed,
@@ -13,19 +13,19 @@ public record KeystrokeEvent(
     
     public KeystrokeEvent {
         if (isNotAscii(typed) || isNotAscii(expected)) {
-            throw new IllegalKeystrokeEventArgumentsException("Character should be from ASCII set");
+            throw new IllegalKeystrokeEventArgumentException("Character should be from ASCII set");
         }
 
         if (keydownTimestamp > keyupTimestamp) {
-            throw new IllegalKeystrokeEventArgumentsException("Keydown timestamp should be less than keyup timestamp");
+            throw new IllegalKeystrokeEventArgumentException("Keydown timestamp should be less than keyup timestamp");
         }
 
         if (isBackspace && (typed != '\0' || expected != '\0')) {
-            throw new IllegalKeystrokeEventArgumentsException("Event can't be backspace and typed evet at the same time");
+            throw new IllegalKeystrokeEventArgumentException("Event can't be backspace and typed evet at the same time");
         }
 
         if (position < 0) {
-            throw new IllegalKeystrokeEventArgumentsException("Position should be greater than 0");
+            throw new IllegalKeystrokeEventArgumentException("Position should be greater than 0");
         }
     }
     
