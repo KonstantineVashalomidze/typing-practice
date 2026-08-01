@@ -1,81 +1,88 @@
 package com.github.konstantinevashalomidze.domain;
 
-import com.github.konstantinevashalomidze.domain.exceptions.SessionAlreadyStartedException;
-import com.github.konstantinevashalomidze.domain.exceptions.SessionNotStartedException;
-import com.github.konstantinevashalomidze.domain.service.MetricsCalculator;
+import com.github.konstantinevashalomidze.domain.exceptions.TypingSessionAlreadyCompletedException;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
+
+import static com.github.konstantinevashalomidze.domain.TypingSession.State.*;
 
 public class TypingSession {
-    private final List<KeystrokeEvent> keystrokeEvents = new ArrayList<>();
-    private final List<SessionListener> sessionListeners = new ArrayList<>();
-    private long startTime;
-    private long finishTime;
-
-    
-    public boolean started() {
-        return startTime != 0 && finishTime == 0;
+    public enum CharState {
+        CORRECT,
+        INCORRECT,
+        DEFAULT
     }
 
-    public boolean finished() {
-        return startTime != 0 && finishTime != 0;
-    }
-    
+    private List<Character> typedSoFar = new ArrayList<>();
+    private State state = TO_DO;
+    private String targetText;
+    private int caretPosition;
 
-    public void start() {
-        if (started()) {
-            throw new SessionAlreadyStartedException("Session already started");
-        }
-        keystrokeEvents.clear();
-        startTime = System.nanoTime();
-        sessionListeners.forEach(sessionListener -> 
-                sessionListener.onStarted(startTime));
+    public TypingSession(String targetText) {
+        this.targetText = targetText;
     }
 
 
-    public void finish() {
-        if (!started()) {
-            throw new SessionNotStartedException("Session not started");
+
+    public CharState newChar(char c) {
+        if (state == COMPLETED) {
+            throw new TypingSessionAlreadyCompletedException("Typing session already completed");
         }
 
-        if (finished()) {
-            throw new SessionNotStartedException("Session not started");
+        if (typedSoFar.isEmpty() && c == '\b') {
+            return CharState.DEFAULT;
+        } else if (c == '\b') {
+            typedSoFar.removeLast();
+            caretPosition--;
+            return CharState.DEFAULT;
+        } else {
+            if (state != COMPLETED) {
+                typedSoFar.add(c);
+            }
+             if (c == targetText.charAt(caretPosition)) {
+                 caretPosition++;
+                 if (state == TO_DO) {
+                     state = IN_PROGRESS;
+                 } else if (state == IN_PROGRESS && caretPosition >= targetText.length()) {
+                     state = COMPLETED;
+                 }
+                 return CharState.CORRECT;
+            } else {
+                 caretPosition++;
+                 if (state == TO_DO) {
+                     state = IN_PROGRESS;
+                 } else if (state == IN_PROGRESS && caretPosition >= targetText.length()) {
+                     state = COMPLETED;
+                 }
+                 return CharState.INCORRECT;
+            }
         }
-        finishTime = System.nanoTime();
-        keystrokeEvents.clear();
-        MetricsCalculator.compute(keystrokeEvents, startTime, finishTime);
-        sessionListeners.forEach(sessionListener -> sessionListener.onFinished(finishTime));
+
     }
 
-    public void addEvent(KeystrokeEvent event) {
-        if (!started()) {
-            throw new SessionNotStartedException("Session has not been started");
-        }
-        keystrokeEvents.add(event);
-        sessionListeners.forEach(sessionListener -> sessionListener.onKeystrokeEvent(event));
+    public int getCaretPosition() {
+        return caretPosition;
     }
 
-    public String typedSoFar() {
-        StringBuilder sb = new StringBuilder();
-        for (var kse : keystrokeEvents) {
-            sb.append(kse.typed());
-        }
-        return sb + "";
+    public List<Character> getTypedSoFar() {
+        return typedSoFar;
     }
 
-    public List<Boolean> correctness() {
-        List<Boolean> correctness = new ArrayList<>();
-        for (var kse : keystrokeEvents) {
-            correctness.add(kse.isCorrect());
-        }
-        return correctness;
+    public State getState() {
+        return state;
     }
 
-    public void addListener(SessionListener sessionListener) {
-        sessionListeners.add(sessionListener);
+    public void setState(State state) {
+        this.state = state;
     }
 
 
+    public String getTargetText() {
+        return targetText;
+    }
+
+    public enum State {
+        TO_DO, IN_PROGRESS, COMPLETED
+    }
 }

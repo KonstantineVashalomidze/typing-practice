@@ -2,12 +2,15 @@ package com.github.konstantinevashalomidze.domain.view;
 
 import com.github.konstantinevashalomidze.domain.Metrics;
 
+import java.awt.*;
 import java.util.List;
 
 public interface TypingView {
-    void displayTargetText(String targetText);
-    void updateLiveMetrics(double wpm, double accuracy);
-    void showFinalResults(Metrics metrics);
-    void addKeyEventHandler(KeyEventHandler keh);
-    void updateTypedProgress(String typedSoFar, List<Boolean> correctness);
+
+
+
+    void drawTargetText(String targetText);
+    void drawCaretAt(int i);
+    void colorCharAt(int i, Color color);
+
 }
