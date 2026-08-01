@@ -58,7 +58,7 @@ public class TypingPanel extends JPanel implements KeyListener, TypingView {
             }
             // Draw caret at
             if (caretPosition < targetTextLength && caretPosition == i) {
-                g2d.setColor(Color.BLUE);
+                g2d.setColor(Color.BLACK);
                 g2d.drawRect(drawTargetTextX, drawTargetTextY - fm.getAscent(),
                         charWidth, fm.getAscent() + fm.getDescent());
             }
@@ -108,7 +108,9 @@ public class TypingPanel extends JPanel implements KeyListener, TypingView {
 
     @Override
     public void keyPressed(KeyEvent e) {
-
+        if (e.isControlDown() && e.getKeyCode() == KeyEvent.VK_N) {
+            typingViewHandler.newSession();
+        }
     }
 
     @Override

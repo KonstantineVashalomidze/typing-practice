@@ -50,6 +50,11 @@ public class TypingPresenter implements TypingViewHandler {
         }
     }
 
+    @Override
+    public void newSession() {
+        createNewSession();
+    }
+
     private Color correctnessToColorMapper(TypingSession.CharState charState) {
         return switch (charState) {
             case CORRECT -> Color.BLACK;
