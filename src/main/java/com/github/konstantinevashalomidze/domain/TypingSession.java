@@ -18,12 +18,14 @@ public class TypingSession {
     private State state = TO_DO;
     private String targetText;
     private int caretPosition;
+    private long startTimeNanos;
+    private long endTimeNanos;
+    private double wpm;
+    private int errorCount;
 
     public TypingSession(String targetText) {
         this.targetText = targetText;
     }
-
-
 
     public CharState newChar(char c) {
         if (state == COMPLETED) {
@@ -37,28 +39,40 @@ public class TypingSession {
             caretPosition--;
             return CharState.DEFAULT;
         } else {
-            if (state != COMPLETED) {
-                typedSoFar.add(c);
-            }
-             if (c == targetText.charAt(caretPosition)) {
+            typedSoFar.add(c);
+            if (c == targetText.charAt(caretPosition)) {
                  caretPosition++;
                  if (state == TO_DO) {
                      state = IN_PROGRESS;
+                     startTimeNanos = System.nanoTime();
                  } else if (state == IN_PROGRESS && caretPosition >= targetText.length()) {
                      state = COMPLETED;
+                     endTimeNanos = System.nanoTime();
                  }
                  return CharState.CORRECT;
             } else {
                  caretPosition++;
                  if (state == TO_DO) {
                      state = IN_PROGRESS;
+                     startTimeNanos = System.nanoTime();
                  } else if (state == IN_PROGRESS && caretPosition >= targetText.length()) {
                      state = COMPLETED;
+                     endTimeNanos = System.nanoTime();
                  }
+                 errorCount++;
                  return CharState.INCORRECT;
             }
         }
 
+    }
+
+    private void calculateWpm() {
+        if (state != COMPLETED) {
+            endTimeNanos = System.nanoTime();
+        }
+        double elapsedMinutes = (endTimeNanos - startTimeNanos) / 60_000_000_000.;
+        int numberOfChars = typedSoFar.size();
+        wpm = (Math.max(0, (numberOfChars - errorCount)/ 5.)) / elapsedMinutes;
     }
 
     public int getCaretPosition() {
@@ -77,6 +91,10 @@ public class TypingSession {
         this.state = state;
     }
 
+    public double getWpm() {
+        calculateWpm();
+        return wpm;
+    }
 
     public String getTargetText() {
         return targetText;

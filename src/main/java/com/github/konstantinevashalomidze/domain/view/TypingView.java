@@ -13,4 +13,5 @@ public interface TypingView {
     void drawCaretAt(int i);
     void colorCharAt(int i, Color color);
 
+    void displayWpm(double wpm);
 }

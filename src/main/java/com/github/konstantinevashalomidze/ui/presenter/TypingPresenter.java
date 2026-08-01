@@ -8,9 +8,11 @@ import com.github.konstantinevashalomidze.domain.view.TypingView;
 import com.github.konstantinevashalomidze.domain.view.TypingViewHandler;
 
 import java.awt.*;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class TypingPresenter implements TypingViewHandler {
-    private final TextProvider textProvider = new RandomWordApiProvider(40);
+    private final TextProvider textProvider = new RandomWordApiProvider(40, 1, 3);
     private TypingView typingView;
     public void setTypingView(TypingView typingView) {
         this.typingView = typingView;
@@ -22,6 +24,15 @@ public class TypingPresenter implements TypingViewHandler {
         typingSession = new TypingSession(targetText);
         typingView.drawTargetText(targetText);
         typingView.drawCaretAt(typingSession.getCaretPosition());
+        Timer timer = new Timer();
+        TimerTask task = new TimerTask() {
+            @Override
+            public void run() {
+                typingView.displayWpm(typingSession.getWpm());
+            }
+        };
+        timer.scheduleAtFixedRate(task, 0, 500);
+
     }
 
     @Override

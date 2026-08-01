@@ -26,6 +26,7 @@ public class TypingPanel extends JPanel implements KeyListener, TypingView {
     private String targetText;
     private Color[] indexColors;
     private final int MARGIN_X = 40, MARGIN_Y = 30;
+    private double wpm;
 
     public TypingPanel() {
         setFocusable(true);
@@ -76,8 +77,14 @@ public class TypingPanel extends JPanel implements KeyListener, TypingView {
         }
 
         g2d.setFont(shortcutHintFont);
-        g2d.drawString("ctrl + n - new game", MARGIN_X, getHeight() - (MARGIN_Y / 2));
+        g2d.setColor(Color.DARK_GRAY);
+        int bottomLineLabels = getHeight() - (MARGIN_Y / 2);
+        g2d.drawString("ctrl + n - new game", MARGIN_X, bottomLineLabels);
 
+
+        String wpmLocal = String.valueOf((int) wpm);
+        g2d.drawString("WPM: ", MARGIN_X + fm.stringWidth("ctrl + n - new game"), bottomLineLabels);
+        g2d.drawString(wpmLocal, MARGIN_X + fm.stringWidth("ctrl + n - new game WPM: "), bottomLineLabels);
     }
 
 
@@ -98,6 +105,12 @@ public class TypingPanel extends JPanel implements KeyListener, TypingView {
     @Override
     public void colorCharAt(int i, Color color) {
         indexColors[i] = color;
+        repaint();
+    }
+
+    @Override
+    public void displayWpm(double wpm) {
+        this.wpm = wpm;
         repaint();
     }
 
