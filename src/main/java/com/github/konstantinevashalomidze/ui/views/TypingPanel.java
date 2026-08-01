@@ -80,7 +80,7 @@ public class TypingPanel extends JPanel implements KeyListener, TypingView {
     public void drawTargetText(String targetText) {
         this.targetText = targetText;
         indexColors = new Color[targetText.length()];
-        Arrays.fill(indexColors, Color.BLACK);
+        Arrays.fill(indexColors, new Color(0, 0, 0, 128));
         repaint();
     }
 

@@ -52,9 +52,9 @@ public class TypingPresenter implements TypingViewHandler {
 
     private Color correctnessToColorMapper(TypingSession.CharState charState) {
         return switch (charState) {
-            case CORRECT -> Color.GREEN;
+            case CORRECT -> Color.BLACK;
             case INCORRECT -> Color.RED;
-            default -> Color.BLACK;
+            default -> new Color(0, 0, 0, 128);
         };
     }
 
