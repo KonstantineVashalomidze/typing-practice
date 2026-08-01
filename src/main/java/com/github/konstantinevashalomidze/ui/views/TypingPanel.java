@@ -45,6 +45,7 @@ public class TypingPanel extends JPanel implements KeyListener, TypingView {
             int charWidth = fm.stringWidth(targetTextChar);
             // right border is reached wrap continue drawing on next line
             if (drawTargetTextX + charWidth >= getWidth() - MARGIN_X) {
+                // If caret were currently on the middle of the word type -
                 drawTargetTextX = MARGIN_X;
                 drawTargetTextY += fm.getAscent() + fm.getDescent();
             }
@@ -55,7 +56,16 @@ public class TypingPanel extends JPanel implements KeyListener, TypingView {
                         charWidth, fm.getAscent() + fm.getDescent());
             }
             g2d.setColor(indexColors[i]);
-            if (" ".equals(targetTextChar) && indexColors[i] == Color.RED) {
+            if (" ".equals(targetTextChar)) {
+                Color originalColor = indexColors[i];
+                if (originalColor != Color.RED) {
+                    g2d.setColor(new Color(
+                            originalColor.getRed(),
+                            originalColor.getGreen(),
+                            originalColor.getBlue(),
+                            10
+                    ));
+                }
                 g2d.drawString("_", drawTargetTextX, drawTargetTextY);
             } else {
                 g2d.drawString(targetTextChar, drawTargetTextX, drawTargetTextY);
