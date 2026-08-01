@@ -2,7 +2,7 @@ package com.github.konstantinevashalomidze.ui.presenter;
 
 import com.github.konstantinevashalomidze.domain.TypingSession;
 import com.github.konstantinevashalomidze.domain.exceptions.TypingSessionHasNotBeenStartedException;
-import com.github.konstantinevashalomidze.domain.service.RandomTextProvider;
+import com.github.konstantinevashalomidze.domain.service.RandomWordApiProvider;
 import com.github.konstantinevashalomidze.domain.service.TextProvider;
 import com.github.konstantinevashalomidze.domain.view.TypingView;
 import com.github.konstantinevashalomidze.domain.view.TypingViewHandler;
@@ -10,7 +10,7 @@ import com.github.konstantinevashalomidze.domain.view.TypingViewHandler;
 import java.awt.*;
 
 public class TypingPresenter implements TypingViewHandler {
-    private final TextProvider textProvider = new RandomTextProvider();
+    private final TextProvider textProvider = new RandomWordApiProvider(40);
     private TypingView typingView;
     public void setTypingView(TypingView typingView) {
         this.typingView = typingView;
@@ -18,8 +18,9 @@ public class TypingPresenter implements TypingViewHandler {
     private TypingSession typingSession;
 
     public void createNewSession() {
-        typingSession = new TypingSession(textProvider.getText());
-        typingView.drawTargetText(textProvider.getText());
+        String targetText = textProvider.getText();
+        typingSession = new TypingSession(targetText);
+        typingView.drawTargetText(targetText);
         typingView.drawCaretAt(typingSession.getCaretPosition());
     }
 
