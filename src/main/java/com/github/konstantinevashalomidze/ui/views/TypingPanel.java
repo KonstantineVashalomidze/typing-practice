@@ -15,6 +15,13 @@ public class TypingPanel extends JPanel implements KeyListener, TypingView {
         this.typingViewHandler = typingViewHandler;
     }
 
+    private final Font targetTextFont = new Font(Font.DIALOG_INPUT, Font.PLAIN, 24);
+    private final Font shortcutHintFont = new  Font(Font.DIALOG_INPUT, Font.PLAIN, 12);
+    private final Color targetTextColorDefault = new Color(0, 0, 0, 128);
+    private final Color spaceCharColorDefault =
+            new Color(Color.BLACK.getRed(), Color.BLACK.getGreen(), Color.BLACK.getBlue(), 10);
+
+
     private int caretPosition;
     private String targetText;
     private Color[] indexColors;
@@ -23,7 +30,6 @@ public class TypingPanel extends JPanel implements KeyListener, TypingView {
     public TypingPanel() {
         setFocusable(true);
         addKeyListener(this);
-        setFont(new Font(Font.DIALOG_INPUT, Font.PLAIN, 24));
     }
 
 
@@ -35,6 +41,7 @@ public class TypingPanel extends JPanel implements KeyListener, TypingView {
                 RenderingHints.KEY_TEXT_ANTIALIASING,
                 RenderingHints.VALUE_TEXT_ANTIALIAS_ON
         );
+        g2d.setFont(targetTextFont);
 
         FontMetrics fm = g2d.getFontMetrics();
 
@@ -59,12 +66,7 @@ public class TypingPanel extends JPanel implements KeyListener, TypingView {
             if (" ".equals(targetTextChar)) {
                 Color originalColor = indexColors[i];
                 if (originalColor != Color.RED) {
-                    g2d.setColor(new Color(
-                            originalColor.getRed(),
-                            originalColor.getGreen(),
-                            originalColor.getBlue(),
-                            10
-                    ));
+                    g2d.setColor(spaceCharColorDefault);
                 }
                 g2d.drawString("_", drawTargetTextX, drawTargetTextY);
             } else {
@@ -73,6 +75,9 @@ public class TypingPanel extends JPanel implements KeyListener, TypingView {
             drawTargetTextX += charWidth;
         }
 
+        g2d.setFont(shortcutHintFont);
+        g2d.drawString("ctrl + n - new game", MARGIN_X, getHeight() - (MARGIN_Y / 2));
+
     }
 
 
@@ -80,7 +85,7 @@ public class TypingPanel extends JPanel implements KeyListener, TypingView {
     public void drawTargetText(String targetText) {
         this.targetText = targetText;
         indexColors = new Color[targetText.length()];
-        Arrays.fill(indexColors, new Color(0, 0, 0, 128));
+        Arrays.fill(indexColors, targetTextColorDefault);
         repaint();
     }
 
