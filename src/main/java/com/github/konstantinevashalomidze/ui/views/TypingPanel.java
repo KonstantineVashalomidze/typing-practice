@@ -7,9 +7,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 public class TypingPanel extends JPanel implements KeyListener, TypingView {
     private TypingViewHandler typingViewHandler;
@@ -57,7 +55,11 @@ public class TypingPanel extends JPanel implements KeyListener, TypingView {
                         charWidth, fm.getAscent() + fm.getDescent());
             }
             g2d.setColor(indexColors[i]);
-            g2d.drawString(targetTextChar, drawTargetTextX, drawTargetTextY);
+            if (" ".equals(targetTextChar) && indexColors[i] == Color.RED) {
+                g2d.drawString("_", drawTargetTextX, drawTargetTextY);
+            } else {
+                g2d.drawString(targetTextChar, drawTargetTextX, drawTargetTextY);
+            }
             drawTargetTextX += charWidth;
         }
 
