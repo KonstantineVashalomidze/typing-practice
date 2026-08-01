@@ -1,8 +1,10 @@
 package com.github.konstantinevashalomidze.domain.view;
 
-import java.awt.event.KeyEvent;
-
-public interface KeyEventHandler {
+public interface TypingViewHandler {
     void keyDown(char key);
     void keyUp(char key);
+    void keyTyped(char key);
+
+    void newSession();
+
 }

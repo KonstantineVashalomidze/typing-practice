@@ -1,14 +1,12 @@
 package com.github.konstantinevashalomidze;
 
-import com.github.konstantinevashalomidze.ui.coordinator.AppCoordinator;
-import com.github.konstantinevashalomidze.ui.coordinator.Navigator;
+import com.github.konstantinevashalomidze.ui.presenter.TypingPresenter;
 import com.github.konstantinevashalomidze.ui.views.TypingPanel;
-import com.sun.tools.javac.Main;
 
 import javax.swing.*;
 import java.awt.*;
 
-public class MainFrame extends JFrame implements Navigator {
+public class MainFrame extends JFrame {
     public static void main(String[] args) {
 
         EventQueue.invokeLater(() -> {
@@ -16,19 +14,19 @@ public class MainFrame extends JFrame implements Navigator {
             mainFrame.setSize(800, 600);
             mainFrame.setLocationRelativeTo(null);
             mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            mainFrame.getContentPane().setLayout(new CardLayout());
+            mainFrame.getContentPane().setLayout(new BorderLayout());
 
             TypingPanel typingPanel = new TypingPanel();
-            mainFrame.getContentPane().add(typingPanel, TypingPanel.class.getSimpleName());
-            AppCoordinator appCoordinator = new AppCoordinator(mainFrame, typingPanel);
+            TypingPresenter typingPresenter = new TypingPresenter();
+            typingPanel.setTypingViewHandler(typingPresenter);
+            typingPresenter.setTypingView(typingPanel);
+            typingPresenter.createNewSession();
+
+            mainFrame.getContentPane().add(typingPanel, BorderLayout.CENTER);
 
             mainFrame.setVisible(true);
         });
 
     }
 
-    @Override
-    public void showPanel(String panelName) {
-        ((CardLayout) (getContentPane().getLayout())).show(this, panelName);
-    }
 }
