@@ -108,13 +108,13 @@ public class TypingPanel extends JPanel implements KeyListener, TypingView {
 
     @Override
     public void keyPressed(KeyEvent e) {
-        if (e.isControlDown() && e.getKeyCode() == KeyEvent.VK_N) {
-            typingViewHandler.newSession();
-        }
+
     }
 
     @Override
     public void keyReleased(KeyEvent e) {
-
+        if (e.isControlDown() && e.getKeyCode() == KeyEvent.VK_N) {
+            typingViewHandler.newSession();
+        }
     }
 }
