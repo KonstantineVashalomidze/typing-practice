@@ -1,9 +1,6 @@
 package com.github.konstantinevashalomidze.domain.view;
 
-import com.github.konstantinevashalomidze.domain.Metrics;
-
 import java.awt.*;
-import java.util.List;
 
 public interface TypingView {
 
@@ -13,4 +10,9 @@ public interface TypingView {
     void drawCaretAt(int i);
     void colorCharAt(int i, Color color);
 
+    void displayWpm(double wpm);
+
+    void displayAccuracy(double accuracy);
+
+    void displayErrorCount(int errorCount);
 }

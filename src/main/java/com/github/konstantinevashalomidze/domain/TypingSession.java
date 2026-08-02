@@ -1,6 +1,8 @@
 package com.github.konstantinevashalomidze.domain;
 
+import com.github.konstantinevashalomidze.db.MetricsRepository;
 import com.github.konstantinevashalomidze.domain.exceptions.TypingSessionAlreadyCompletedException;
+import com.github.konstantinevashalomidze.domain.model.Metrics;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,18 +16,23 @@ public class TypingSession {
         DEFAULT
     }
 
-    private List<Character> typedSoFar = new ArrayList<>();
+    private final MetricsRepository metricsRepository;
+    private final List<Character> typedSoFar = new ArrayList<>();
     private State state = TO_DO;
-    private String targetText;
+    private final String targetText;
     private int caretPosition;
+    private long startTimeNanos;
+    private long endTimeNanos;
+    private double wpm;
+    private int errorCount;
+    private double accuracy;
 
-    public TypingSession(String targetText) {
+    public TypingSession(MetricsRepository metricsRepository, String targetText) {
+        this.metricsRepository = metricsRepository;
         this.targetText = targetText;
     }
 
-
-
-    public CharState newChar(char c) {
+    public CharState newChar(char c, long timestamp) {
         if (state == COMPLETED) {
             throw new TypingSessionAlreadyCompletedException("Typing session already completed");
         }
@@ -37,28 +44,48 @@ public class TypingSession {
             caretPosition--;
             return CharState.DEFAULT;
         } else {
-            if (state != COMPLETED) {
-                typedSoFar.add(c);
-            }
-             if (c == targetText.charAt(caretPosition)) {
-                 caretPosition++;
-                 if (state == TO_DO) {
-                     state = IN_PROGRESS;
-                 } else if (state == IN_PROGRESS && caretPosition >= targetText.length()) {
-                     state = COMPLETED;
-                 }
-                 return CharState.CORRECT;
+            typedSoFar.add(c);
+            if (c == targetText.charAt(caretPosition)) {
+                commonPiece();
+                return CharState.CORRECT;
             } else {
-                 caretPosition++;
-                 if (state == TO_DO) {
-                     state = IN_PROGRESS;
-                 } else if (state == IN_PROGRESS && caretPosition >= targetText.length()) {
-                     state = COMPLETED;
-                 }
+                commonPiece();
+                errorCount++;
                  return CharState.INCORRECT;
             }
         }
 
+    }
+
+    private void commonPiece() {
+        caretPosition++;
+        if (state == TO_DO) {
+            state = IN_PROGRESS;
+            startTimeNanos = System.nanoTime();
+        } else if (state == IN_PROGRESS && caretPosition >= targetText.length()) {
+            state = COMPLETED;
+            endTimeNanos = System.nanoTime();
+            calculateAccuracy();
+            metricsRepository.save(new Metrics(
+                   wpm,
+                   accuracy,
+                   errorCount,
+                    targetText
+            ));
+        }
+    }
+
+    private void calculateAccuracy() {
+        accuracy = ((typedSoFar.size() - errorCount) / (double) typedSoFar.size()) * 100.;
+    }
+
+    private void calculateWpm() {
+        if (state != COMPLETED) {
+            endTimeNanos = System.nanoTime();
+        }
+        double elapsedMinutes = (endTimeNanos - startTimeNanos) / 60_000_000_000.;
+        int numberOfChars = typedSoFar.size();
+        wpm = (Math.max(0, (numberOfChars - errorCount)/ 5.)) / elapsedMinutes;
     }
 
     public int getCaretPosition() {
@@ -77,6 +104,19 @@ public class TypingSession {
         this.state = state;
     }
 
+    public double getWpm() {
+        calculateWpm();
+        return wpm;
+    }
+
+    public double getAccuracy() {
+        calculateAccuracy();
+        return accuracy;
+    }
+
+    public int getErrorCount() {
+        return errorCount;
+    }
 
     public String getTargetText() {
         return targetText;

@@ -1,27 +1,53 @@
 package com.github.konstantinevashalomidze.ui.presenter;
 
+import com.github.konstantinevashalomidze.config.Config;
+import com.github.konstantinevashalomidze.db.MetricsRepository;
 import com.github.konstantinevashalomidze.domain.TypingSession;
 import com.github.konstantinevashalomidze.domain.exceptions.TypingSessionHasNotBeenStartedException;
-import com.github.konstantinevashalomidze.domain.service.RandomWordApiProvider;
+import com.github.konstantinevashalomidze.domain.service.ai.AiTextProvider;
 import com.github.konstantinevashalomidze.domain.service.TextProvider;
 import com.github.konstantinevashalomidze.domain.view.TypingView;
 import com.github.konstantinevashalomidze.domain.view.TypingViewHandler;
 
 import java.awt.*;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class TypingPresenter implements TypingViewHandler {
-    private final TextProvider textProvider = new RandomWordApiProvider(40);
+    private final TextProvider textProvider;
     private TypingView typingView;
     public void setTypingView(TypingView typingView) {
         this.typingView = typingView;
     }
     private TypingSession typingSession;
+    private final MetricsRepository metricsRepository;
+    private Timer metricsTimer;
+    private final Config config;
+
+    public TypingPresenter(Config config, MetricsRepository metricsRepository) {
+        this.metricsRepository = metricsRepository;
+        this.config = config;
+        textProvider = new AiTextProvider(config, metricsRepository, 25);
+    }
 
     public void createNewSession() {
         String targetText = textProvider.getText();
-        typingSession = new TypingSession(targetText);
+        typingSession = new TypingSession(metricsRepository, targetText);
         typingView.drawTargetText(targetText);
         typingView.drawCaretAt(typingSession.getCaretPosition());
+        if (metricsTimer != null) {
+            metricsTimer.cancel();
+        }
+        metricsTimer = new Timer(true);
+        TimerTask task = new TimerTask() {
+            @Override
+            public void run() {
+                typingView.displayWpm(typingSession.getWpm());
+                typingView.displayAccuracy(typingSession.getAccuracy());
+                typingView.displayErrorCount(typingSession.getErrorCount());
+            }
+        };
+        metricsTimer.scheduleAtFixedRate(task, 0, 500);
     }
 
     @Override
@@ -42,7 +68,7 @@ public class TypingPresenter implements TypingViewHandler {
 
         if (typingSession.getState() != TypingSession.State.COMPLETED) {
             int prevCaretPosition = typingSession.getCaretPosition();
-            var charState = typingSession.newChar(key);
+            var charState = typingSession.newChar(key, System.nanoTime());
             int caretPosition = typingSession.getCaretPosition();
 
             typingView.colorCharAt(charState == TypingSession.CharState.DEFAULT ? caretPosition

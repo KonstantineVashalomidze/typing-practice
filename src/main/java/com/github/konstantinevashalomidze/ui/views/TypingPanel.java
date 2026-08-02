@@ -8,9 +8,13 @@ import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
 
 public class TypingPanel extends JPanel implements KeyListener, TypingView {
     private TypingViewHandler typingViewHandler;
+    private int errorCount;
+
     public void setTypingViewHandler(TypingViewHandler typingViewHandler) {
         this.typingViewHandler = typingViewHandler;
     }
@@ -26,6 +30,8 @@ public class TypingPanel extends JPanel implements KeyListener, TypingView {
     private String targetText;
     private Color[] indexColors;
     private final int MARGIN_X = 40, MARGIN_Y = 30;
+    private double wpm;
+    private double accuracy;
 
     public TypingPanel() {
         setFocusable(true);
@@ -76,8 +82,22 @@ public class TypingPanel extends JPanel implements KeyListener, TypingView {
         }
 
         g2d.setFont(shortcutHintFont);
-        g2d.drawString("ctrl + n - new game", MARGIN_X, getHeight() - (MARGIN_Y / 2));
-
+        g2d.setColor(Color.DARK_GRAY);
+        fm = g2d.getFontMetrics();
+        int bottomLineLabels = getHeight() - (MARGIN_Y / 2);
+        String wpmLocal = String.valueOf((int) wpm);
+        String accuracyLocal = String.valueOf((int) accuracy);
+        List<String> bottomLabels = List.of(
+                "ctrl + n - new game",
+                " * WPM:", wpmLocal,
+                " * ACCURACY:", accuracyLocal,
+                " * ERRORS:", String.valueOf(errorCount));
+        int drawingX = MARGIN_X;
+        for (String bottomLabel : bottomLabels) {
+            g2d.drawString(bottomLabel, drawingX,
+                    bottomLineLabels);
+            drawingX += fm.stringWidth(bottomLabel);
+        }
     }
 
 
@@ -100,6 +120,25 @@ public class TypingPanel extends JPanel implements KeyListener, TypingView {
         indexColors[i] = color;
         repaint();
     }
+
+    @Override
+    public void displayWpm(double wpm) {
+        this.wpm = wpm;
+        repaint();
+    }
+
+    @Override
+    public void displayAccuracy(double accuracy) {
+        this.accuracy = accuracy;
+        repaint();
+    }
+
+    @Override
+    public void displayErrorCount(int errorCount) {
+        this.errorCount = errorCount;
+        repaint();
+    }
+
 
     @Override
     public void keyTyped(KeyEvent e) {
