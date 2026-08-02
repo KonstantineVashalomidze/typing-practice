@@ -7,6 +7,8 @@ import com.github.konstantinevashalomidze.ui.views.TypingPanel;
 import javax.swing.*;
 
 import java.awt.*;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 public class MainFrame extends JFrame {
 
@@ -29,7 +31,10 @@ public class MainFrame extends JFrame {
             mainFrame.getContentPane().add(typingPanel, BorderLayout.CENTER);
 
             mainFrame.setVisible(true);
+
         });
+
+
     }
 
 }

@@ -20,6 +20,7 @@ public class TypingPresenter implements TypingViewHandler {
     }
     private TypingSession typingSession;
     private final MetricsRepository metricsRepository;
+    private Timer metricsTimer;
 
     public TypingPresenter(MetricsRepository metricsRepository) {
         this.metricsRepository = metricsRepository;
@@ -30,7 +31,10 @@ public class TypingPresenter implements TypingViewHandler {
         typingSession = new TypingSession(metricsRepository, targetText);
         typingView.drawTargetText(targetText);
         typingView.drawCaretAt(typingSession.getCaretPosition());
-        Timer timer = new Timer();
+        if (metricsTimer != null) {
+            metricsTimer.cancel();
+        }
+        metricsTimer = new Timer(true);
         TimerTask task = new TimerTask() {
             @Override
             public void run() {
@@ -38,7 +42,7 @@ public class TypingPresenter implements TypingViewHandler {
                 typingView.displayAccuracy(typingSession.getAccuracy());
             }
         };
-        timer.scheduleAtFixedRate(task, 0, 500);
+        metricsTimer.scheduleAtFixedRate(task, 0, 500);
     }
 
     @Override
@@ -59,7 +63,7 @@ public class TypingPresenter implements TypingViewHandler {
 
         if (typingSession.getState() != TypingSession.State.COMPLETED) {
             int prevCaretPosition = typingSession.getCaretPosition();
-            var charState = typingSession.newChar(key);
+            var charState = typingSession.newChar(key, System.nanoTime());
             int caretPosition = typingSession.getCaretPosition();
 
             typingView.colorCharAt(charState == TypingSession.CharState.DEFAULT ? caretPosition

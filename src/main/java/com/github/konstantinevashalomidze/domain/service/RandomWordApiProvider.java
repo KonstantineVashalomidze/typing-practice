@@ -22,7 +22,7 @@ public class RandomWordApiProvider implements TextProvider {
         this.diff = diff;
         this.length = length;
 
-        Timer timer = new Timer();
+        Timer timer = new Timer(true);
         TimerTask task = new TimerTask() {
             @Override
             public void run() {

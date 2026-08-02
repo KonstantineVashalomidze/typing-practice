@@ -16,9 +16,9 @@ public class TypingSession {
     }
 
     private final MetricsRepository metricsRepository;
-    private List<Character> typedSoFar = new ArrayList<>();
+    private final List<Character> typedSoFar = new ArrayList<>();
     private State state = TO_DO;
-    private String targetText;
+    private final String targetText;
     private int caretPosition;
     private long startTimeNanos;
     private long endTimeNanos;
@@ -31,7 +31,7 @@ public class TypingSession {
         this.targetText = targetText;
     }
 
-    public CharState newChar(char c) {
+    public CharState newChar(char c, long timestamp) {
         if (state == COMPLETED) {
             throw new TypingSessionAlreadyCompletedException("Typing session already completed");
         }
