@@ -68,7 +68,8 @@ public class TypingSession {
             metricsRepository.save(new Metrics(
                    wpm,
                    accuracy,
-                   errorCount
+                   errorCount,
+                    targetText
             ));
         }
     }
