@@ -114,6 +114,10 @@ public class TypingSession {
         return accuracy;
     }
 
+    public int getErrorCount() {
+        return errorCount;
+    }
+
     public String getTargetText() {
         return targetText;
     }

@@ -32,12 +32,9 @@ public class AiTextProvider implements TextProvider {
         GenerateContentResponse response =
                 client.models.generateContent(
                         "gemini-3.1-flash-lite",
-                        "Generate %d English lowercase words separated by space, nothing more nothing less. Here are the users previous performance metrics on specific texts so you should generate words on depending on previous metrics such that user will feel addicted to this game. %s"
+                        "Generate %d English lowercase words separated by space, nothing more nothing less."
                                 .formatted(
-                                        numberOfWords,
-                                        metrics.stream()
-                                                .map(m ->
-                                                        "text: " + m.targetText() + "acc: " + m.accuracy() + "wpm:" + m.netWpm() + "err:" + m.errorCount())
+                                        numberOfWords
                                         ),
                         null
                 );

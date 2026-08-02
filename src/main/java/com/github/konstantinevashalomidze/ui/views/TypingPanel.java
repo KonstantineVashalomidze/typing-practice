@@ -13,6 +13,8 @@ import java.util.List;
 
 public class TypingPanel extends JPanel implements KeyListener, TypingView {
     private TypingViewHandler typingViewHandler;
+    private int errorCount;
+
     public void setTypingViewHandler(TypingViewHandler typingViewHandler) {
         this.typingViewHandler = typingViewHandler;
     }
@@ -85,7 +87,11 @@ public class TypingPanel extends JPanel implements KeyListener, TypingView {
         int bottomLineLabels = getHeight() - (MARGIN_Y / 2);
         String wpmLocal = String.valueOf((int) wpm);
         String accuracyLocal = String.valueOf((int) accuracy);
-        List<String> bottomLabels = List.of("ctrl + n - new game", " | WPM:", wpmLocal, " | ACCURACY:", accuracyLocal);
+        List<String> bottomLabels = List.of(
+                "ctrl + n - new game",
+                " * WPM:", wpmLocal,
+                " * ACCURACY:", accuracyLocal,
+                " * ERRORS:", String.valueOf(errorCount));
         int drawingX = MARGIN_X;
         for (String bottomLabel : bottomLabels) {
             g2d.drawString(bottomLabel, drawingX,
@@ -126,6 +132,13 @@ public class TypingPanel extends JPanel implements KeyListener, TypingView {
         this.accuracy = accuracy;
         repaint();
     }
+
+    @Override
+    public void displayErrorCount(int errorCount) {
+        this.errorCount = errorCount;
+        repaint();
+    }
+
 
     @Override
     public void keyTyped(KeyEvent e) {

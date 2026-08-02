@@ -5,7 +5,6 @@ import com.github.konstantinevashalomidze.db.MetricsRepository;
 import com.github.konstantinevashalomidze.domain.TypingSession;
 import com.github.konstantinevashalomidze.domain.exceptions.TypingSessionHasNotBeenStartedException;
 import com.github.konstantinevashalomidze.domain.service.ai.AiTextProvider;
-import com.github.konstantinevashalomidze.domain.service.random.RandomTextProvider;
 import com.github.konstantinevashalomidze.domain.service.TextProvider;
 import com.github.konstantinevashalomidze.domain.view.TypingView;
 import com.github.konstantinevashalomidze.domain.view.TypingViewHandler;
@@ -45,6 +44,7 @@ public class TypingPresenter implements TypingViewHandler {
             public void run() {
                 typingView.displayWpm(typingSession.getWpm());
                 typingView.displayAccuracy(typingSession.getAccuracy());
+                typingView.displayErrorCount(typingSession.getErrorCount());
             }
         };
         metricsTimer.scheduleAtFixedRate(task, 0, 500);

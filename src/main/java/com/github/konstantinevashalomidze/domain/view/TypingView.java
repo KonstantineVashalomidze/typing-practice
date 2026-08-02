@@ -13,4 +13,6 @@ public interface TypingView {
     void displayWpm(double wpm);
 
     void displayAccuracy(double accuracy);
+
+    void displayErrorCount(int errorCount);
 }
