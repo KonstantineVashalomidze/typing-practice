@@ -8,6 +8,8 @@ import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
 
 public class TypingPanel extends JPanel implements KeyListener, TypingView {
     private TypingViewHandler typingViewHandler;
@@ -27,6 +29,7 @@ public class TypingPanel extends JPanel implements KeyListener, TypingView {
     private Color[] indexColors;
     private final int MARGIN_X = 40, MARGIN_Y = 30;
     private double wpm;
+    private double accuracy;
 
     public TypingPanel() {
         setFocusable(true);
@@ -79,12 +82,15 @@ public class TypingPanel extends JPanel implements KeyListener, TypingView {
         g2d.setFont(shortcutHintFont);
         g2d.setColor(Color.DARK_GRAY);
         int bottomLineLabels = getHeight() - (MARGIN_Y / 2);
-        g2d.drawString("ctrl + n - new game", MARGIN_X, bottomLineLabels);
-
-
         String wpmLocal = String.valueOf((int) wpm);
-        g2d.drawString("WPM: ", MARGIN_X + fm.stringWidth("ctrl + n - new game"), bottomLineLabels);
-        g2d.drawString(wpmLocal, MARGIN_X + fm.stringWidth("ctrl + n - new game WPM: "), bottomLineLabels);
+        String accuracyLocal = String.valueOf((int) accuracy);
+        List<String> bottomLabels = List.of("ctrl + n - new game", "WPM:", wpmLocal, "ACCURACY:", accuracyLocal);
+        int drawingX = MARGIN_X;
+        for (int i = 0; i < bottomLabels.size(); i++) {
+            g2d.drawString(bottomLabels.get(i),  drawingX,
+                    bottomLineLabels);
+            drawingX += fm.stringWidth(bottomLabels.get(i));
+        }
     }
 
 
@@ -111,6 +117,12 @@ public class TypingPanel extends JPanel implements KeyListener, TypingView {
     @Override
     public void displayWpm(double wpm) {
         this.wpm = wpm;
+        repaint();
+    }
+
+    @Override
+    public void displayAccuracy(double accuracy) {
+        this.accuracy = accuracy;
         repaint();
     }
 

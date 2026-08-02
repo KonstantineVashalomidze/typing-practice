@@ -35,6 +35,7 @@ public class TypingPresenter implements TypingViewHandler {
             @Override
             public void run() {
                 typingView.displayWpm(typingSession.getWpm());
+                typingView.displayAccuracy(typingSession.getAccuracy());
             }
         };
         timer.scheduleAtFixedRate(task, 0, 500);

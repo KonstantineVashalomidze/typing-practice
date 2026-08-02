@@ -24,6 +24,7 @@ public class TypingSession {
     private long endTimeNanos;
     private double wpm;
     private int errorCount;
+    private double accuracy;
 
     public TypingSession(MetricsRepository metricsRepository, String targetText) {
         this.metricsRepository = metricsRepository;
@@ -63,12 +64,17 @@ public class TypingSession {
         } else if (state == IN_PROGRESS && caretPosition >= targetText.length()) {
             state = COMPLETED;
             endTimeNanos = System.nanoTime();
+            calculateAccuracy();
             metricsRepository.save(new Metrics(
                    wpm,
-                   -1,
+                   accuracy,
                    errorCount
             ));
         }
+    }
+
+    private void calculateAccuracy() {
+        accuracy = ((typedSoFar.size() - errorCount) / (double) typedSoFar.size()) * 100.;
     }
 
     private void calculateWpm() {
@@ -99,6 +105,11 @@ public class TypingSession {
     public double getWpm() {
         calculateWpm();
         return wpm;
+    }
+
+    public double getAccuracy() {
+        calculateAccuracy();
+        return accuracy;
     }
 
     public String getTargetText() {
