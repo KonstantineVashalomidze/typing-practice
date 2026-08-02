@@ -1,6 +1,6 @@
 package com.github.konstantinevashalomidze.db;
 
-import com.github.konstantinevashalomidze.domain.Metrics;
+import com.github.konstantinevashalomidze.domain.model.Metrics;
 import com.mongodb.client.MongoCollection;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
@@ -27,7 +27,6 @@ public class MetricsRepository {
 
     public void save(Metrics metrics) {
         collection.insertOne(metrics);
-        logger.info("saved metrics: {}", metrics);
     }
 
     public List<Metrics> findAll() {

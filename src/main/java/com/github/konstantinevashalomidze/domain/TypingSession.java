@@ -2,6 +2,7 @@ package com.github.konstantinevashalomidze.domain;
 
 import com.github.konstantinevashalomidze.db.MetricsRepository;
 import com.github.konstantinevashalomidze.domain.exceptions.TypingSessionAlreadyCompletedException;
+import com.github.konstantinevashalomidze.domain.model.Metrics;
 
 import java.util.ArrayList;
 import java.util.List;

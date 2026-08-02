@@ -1,9 +1,6 @@
 package com.github.konstantinevashalomidze.domain.view;
 
-import com.github.konstantinevashalomidze.domain.Metrics;
-
 import java.awt.*;
-import java.util.List;
 
 public interface TypingView {
 

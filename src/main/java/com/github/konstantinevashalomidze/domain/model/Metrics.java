@@ -1,4 +1,4 @@
-package com.github.konstantinevashalomidze.domain;
+package com.github.konstantinevashalomidze.domain.model;
 
 import org.bson.types.ObjectId;
 

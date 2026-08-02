@@ -28,7 +28,7 @@ public class TypingPresenter implements TypingViewHandler {
     public TypingPresenter(Config config, MetricsRepository metricsRepository) {
         this.metricsRepository = metricsRepository;
         this.config = config;
-        textProvider = new AiTextProvider(config, 25);
+        textProvider = new AiTextProvider(config, metricsRepository, 25);
     }
 
     public void createNewSession() {
