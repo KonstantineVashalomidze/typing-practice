@@ -81,15 +81,16 @@ public class TypingPanel extends JPanel implements KeyListener, TypingView {
 
         g2d.setFont(shortcutHintFont);
         g2d.setColor(Color.DARK_GRAY);
+        fm = g2d.getFontMetrics();
         int bottomLineLabels = getHeight() - (MARGIN_Y / 2);
         String wpmLocal = String.valueOf((int) wpm);
         String accuracyLocal = String.valueOf((int) accuracy);
-        List<String> bottomLabels = List.of("ctrl + n - new game", "WPM:", wpmLocal, "ACCURACY:", accuracyLocal);
+        List<String> bottomLabels = List.of("ctrl + n - new game", " | WPM:", wpmLocal, " | ACCURACY:", accuracyLocal);
         int drawingX = MARGIN_X;
-        for (int i = 0; i < bottomLabels.size(); i++) {
-            g2d.drawString(bottomLabels.get(i),  drawingX,
+        for (String bottomLabel : bottomLabels) {
+            g2d.drawString(bottomLabel, drawingX,
                     bottomLineLabels);
-            drawingX += fm.stringWidth(bottomLabels.get(i));
+            drawingX += fm.stringWidth(bottomLabel);
         }
     }
 
