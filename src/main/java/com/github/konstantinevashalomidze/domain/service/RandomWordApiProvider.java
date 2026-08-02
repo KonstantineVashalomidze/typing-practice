@@ -1,7 +1,6 @@
 package com.github.konstantinevashalomidze.domain.service;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import org.bson.Document;
 
 import java.io.IOException;
 import java.net.URI;
@@ -14,9 +13,9 @@ import java.util.*;
 public class RandomWordApiProvider implements TextProvider {
     private final HttpClient httpClient = HttpClient.newHttpClient();
     private final int wordCount;
-    private final ObjectMapper objectMapper = new ObjectMapper();
     private final Queue<String> cache = new LinkedList<>();
     private final int diff, length;
+
 
     public RandomWordApiProvider(int wordCount, int diff, int length) {
         this.wordCount = wordCount;
@@ -47,7 +46,8 @@ public class RandomWordApiProvider implements TextProvider {
                 .build();
         try {
             HttpResponse<String> httpResponse = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
-            List<String> list = objectMapper.readValue(httpResponse.body(), new TypeReference<>() { });
+            Document document = Document.parse("{ \"words\": " + httpResponse.body() + " }");
+            List<String> list = document.getList("words", String.class);
             return String.join(" ", list);
         } catch (IOException | InterruptedException e) {
             return "";

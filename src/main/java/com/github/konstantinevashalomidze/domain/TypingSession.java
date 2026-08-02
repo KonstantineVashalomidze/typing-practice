@@ -1,5 +1,6 @@
 package com.github.konstantinevashalomidze.domain;
 
+import com.github.konstantinevashalomidze.db.MetricsRepository;
 import com.github.konstantinevashalomidze.domain.exceptions.TypingSessionAlreadyCompletedException;
 
 import java.util.ArrayList;
@@ -14,6 +15,7 @@ public class TypingSession {
         DEFAULT
     }
 
+    private final MetricsRepository metricsRepository;
     private List<Character> typedSoFar = new ArrayList<>();
     private State state = TO_DO;
     private String targetText;
@@ -23,7 +25,8 @@ public class TypingSession {
     private double wpm;
     private int errorCount;
 
-    public TypingSession(String targetText) {
+    public TypingSession(MetricsRepository metricsRepository, String targetText) {
+        this.metricsRepository = metricsRepository;
         this.targetText = targetText;
     }
 
@@ -41,29 +44,31 @@ public class TypingSession {
         } else {
             typedSoFar.add(c);
             if (c == targetText.charAt(caretPosition)) {
-                 caretPosition++;
-                 if (state == TO_DO) {
-                     state = IN_PROGRESS;
-                     startTimeNanos = System.nanoTime();
-                 } else if (state == IN_PROGRESS && caretPosition >= targetText.length()) {
-                     state = COMPLETED;
-                     endTimeNanos = System.nanoTime();
-                 }
-                 return CharState.CORRECT;
+                commonPiece();
+                return CharState.CORRECT;
             } else {
-                 caretPosition++;
-                 if (state == TO_DO) {
-                     state = IN_PROGRESS;
-                     startTimeNanos = System.nanoTime();
-                 } else if (state == IN_PROGRESS && caretPosition >= targetText.length()) {
-                     state = COMPLETED;
-                     endTimeNanos = System.nanoTime();
-                 }
-                 errorCount++;
+                commonPiece();
+                errorCount++;
                  return CharState.INCORRECT;
             }
         }
 
+    }
+
+    private void commonPiece() {
+        caretPosition++;
+        if (state == TO_DO) {
+            state = IN_PROGRESS;
+            startTimeNanos = System.nanoTime();
+        } else if (state == IN_PROGRESS && caretPosition >= targetText.length()) {
+            state = COMPLETED;
+            endTimeNanos = System.nanoTime();
+            metricsRepository.save(new Metrics(
+                   wpm,
+                   -1,
+                   errorCount
+            ));
+        }
     }
 
     private void calculateWpm() {

@@ -1,5 +1,6 @@
 package com.github.konstantinevashalomidze.ui.presenter;
 
+import com.github.konstantinevashalomidze.db.MetricsRepository;
 import com.github.konstantinevashalomidze.domain.TypingSession;
 import com.github.konstantinevashalomidze.domain.exceptions.TypingSessionHasNotBeenStartedException;
 import com.github.konstantinevashalomidze.domain.service.RandomWordApiProvider;
@@ -18,10 +19,15 @@ public class TypingPresenter implements TypingViewHandler {
         this.typingView = typingView;
     }
     private TypingSession typingSession;
+    private final MetricsRepository metricsRepository;
+
+    public TypingPresenter(MetricsRepository metricsRepository) {
+        this.metricsRepository = metricsRepository;
+    }
 
     public void createNewSession() {
         String targetText = textProvider.getText();
-        typingSession = new TypingSession(targetText);
+        typingSession = new TypingSession(metricsRepository, targetText);
         typingView.drawTargetText(targetText);
         typingView.drawCaretAt(typingSession.getCaretPosition());
         Timer timer = new Timer();
@@ -32,7 +38,6 @@ public class TypingPresenter implements TypingViewHandler {
             }
         };
         timer.scheduleAtFixedRate(task, 0, 500);
-
     }
 
     @Override
