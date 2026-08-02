@@ -1,5 +1,6 @@
-package com.github.konstantinevashalomidze.domain.service;
+package com.github.konstantinevashalomidze.domain.service.random;
 
+import com.github.konstantinevashalomidze.domain.service.TextProvider;
 import org.bson.Document;
 
 import java.io.IOException;
@@ -10,14 +11,14 @@ import java.net.http.HttpResponse;
 import java.util.*;
 
 
-public class RandomWordApiProvider implements TextProvider {
+public class RandomTextProvider implements TextProvider {
     private final HttpClient httpClient = HttpClient.newHttpClient();
     private final int wordCount;
     private final Queue<String> cache = new LinkedList<>();
     private final int diff, length;
 
 
-    public RandomWordApiProvider(int wordCount, int diff, int length) {
+    public RandomTextProvider(int wordCount, int diff, int length) {
         this.wordCount = wordCount;
         this.diff = diff;
         this.length = length;

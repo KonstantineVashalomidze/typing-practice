@@ -1,9 +1,11 @@
 package com.github.konstantinevashalomidze.ui.presenter;
 
+import com.github.konstantinevashalomidze.config.Config;
 import com.github.konstantinevashalomidze.db.MetricsRepository;
 import com.github.konstantinevashalomidze.domain.TypingSession;
 import com.github.konstantinevashalomidze.domain.exceptions.TypingSessionHasNotBeenStartedException;
-import com.github.konstantinevashalomidze.domain.service.RandomWordApiProvider;
+import com.github.konstantinevashalomidze.domain.service.ai.AiTextProvider;
+import com.github.konstantinevashalomidze.domain.service.random.RandomTextProvider;
 import com.github.konstantinevashalomidze.domain.service.TextProvider;
 import com.github.konstantinevashalomidze.domain.view.TypingView;
 import com.github.konstantinevashalomidze.domain.view.TypingViewHandler;
@@ -13,7 +15,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 public class TypingPresenter implements TypingViewHandler {
-    private final TextProvider textProvider = new RandomWordApiProvider(40, 1, 3);
+    private final TextProvider textProvider;
     private TypingView typingView;
     public void setTypingView(TypingView typingView) {
         this.typingView = typingView;
@@ -21,9 +23,12 @@ public class TypingPresenter implements TypingViewHandler {
     private TypingSession typingSession;
     private final MetricsRepository metricsRepository;
     private Timer metricsTimer;
+    private final Config config;
 
-    public TypingPresenter(MetricsRepository metricsRepository) {
+    public TypingPresenter(Config config, MetricsRepository metricsRepository) {
         this.metricsRepository = metricsRepository;
+        this.config = config;
+        textProvider = new AiTextProvider(config, 25);
     }
 
     public void createNewSession() {
