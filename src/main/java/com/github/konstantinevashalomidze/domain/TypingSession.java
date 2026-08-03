@@ -15,8 +15,7 @@ public class TypingSession {
         INCORRECT,
         DEFAULT
     }
-
-    private final MetricsRepository metricsRepository;
+    
     private final List<Character> typedSoFar = new ArrayList<>();
     private State state = TO_DO;
     private final String targetText;
@@ -27,8 +26,7 @@ public class TypingSession {
     private int errorCount;
     private double accuracy;
 
-    public TypingSession(MetricsRepository metricsRepository, String targetText) {
-        this.metricsRepository = metricsRepository;
+    public TypingSession(String targetText) {
         this.targetText = targetText;
     }
 
@@ -66,12 +64,7 @@ public class TypingSession {
             state = COMPLETED;
             endTimeNanos = System.nanoTime();
             calculateAccuracy();
-            metricsRepository.save(new Metrics(
-                   wpm,
-                   accuracy,
-                   errorCount,
-                    targetText
-            ));
+            calculateWpm();
         }
     }
 

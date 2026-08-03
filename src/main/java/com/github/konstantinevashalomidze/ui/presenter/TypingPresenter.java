@@ -4,6 +4,7 @@ import com.github.konstantinevashalomidze.config.Config;
 import com.github.konstantinevashalomidze.db.MetricsRepository;
 import com.github.konstantinevashalomidze.domain.TypingSession;
 import com.github.konstantinevashalomidze.domain.exceptions.TypingSessionHasNotBeenStartedException;
+import com.github.konstantinevashalomidze.domain.model.Metrics;
 import com.github.konstantinevashalomidze.domain.service.ai.AiTextProvider;
 import com.github.konstantinevashalomidze.domain.service.TextProvider;
 import com.github.konstantinevashalomidze.domain.view.TypingView;
@@ -32,7 +33,7 @@ public class TypingPresenter implements TypingViewHandler {
 
     public void createNewSession() {
         String targetText = textProvider.getText();
-        typingSession = new TypingSession(metricsRepository, targetText);
+        typingSession = new TypingSession(targetText);
         typingView.drawTargetText(targetText);
         typingView.drawCaretAt(typingSession.getCaretPosition());
         if (metricsTimer != null) {
@@ -45,6 +46,15 @@ public class TypingPresenter implements TypingViewHandler {
                 typingView.displayWpm(typingSession.getWpm());
                 typingView.displayAccuracy(typingSession.getAccuracy());
                 typingView.displayErrorCount(typingSession.getErrorCount());
+                if (typingSession.getState() == TypingSession.State.COMPLETED) {
+                    metricsRepository.save(new Metrics(
+                            typingSession.getWpm(),
+                            typingSession.getAccuracy(),
+                            typingSession.getErrorCount(),
+                            targetText
+                    ));
+                    metricsTimer.cancel();
+                }
             }
         };
         metricsTimer.scheduleAtFixedRate(task, 0, 500);
