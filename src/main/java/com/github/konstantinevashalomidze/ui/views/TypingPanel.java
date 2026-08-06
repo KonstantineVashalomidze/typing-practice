@@ -147,7 +147,7 @@ public class TypingPanel extends JPanel implements KeyListener, TypingView {
 
     @Override
     public void keyPressed(KeyEvent e) {
-
+        typingViewHandler.keyDown(e.getKeyChar());
     }
 
     @Override

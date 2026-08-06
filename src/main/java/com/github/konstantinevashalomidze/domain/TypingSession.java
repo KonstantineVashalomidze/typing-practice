@@ -5,17 +5,24 @@ import com.github.konstantinevashalomidze.domain.exceptions.TypingSessionAlready
 import com.github.konstantinevashalomidze.domain.model.Metrics;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static com.github.konstantinevashalomidze.domain.TypingSession.State.*;
 
 public class TypingSession {
+
+
     public enum CharState {
         CORRECT,
         INCORRECT,
         DEFAULT
     }
-    
+
+    public record Entry(Character key, Double value) {}
+
+    private final List<Entry> keyTimestamps = new ArrayList<>();
     private final List<Character> typedSoFar = new ArrayList<>();
     private State state = TO_DO;
     private final String targetText;
@@ -79,6 +86,14 @@ public class TypingSession {
         double elapsedMinutes = (endTimeNanos - startTimeNanos) / 60_000_000_000.;
         int numberOfChars = typedSoFar.size();
         wpm = (Math.max(0, (numberOfChars - errorCount)/ 5.)) / elapsedMinutes;
+    }
+
+    public void keyDown(char key) {
+        keyTimestamps.add(new Entry(key, System.nanoTime() / 60_000_000_000.));
+    }
+
+    public List<Entry> getKeyTimestamps() {
+        return keyTimestamps;
     }
 
     public int getCaretPosition() {

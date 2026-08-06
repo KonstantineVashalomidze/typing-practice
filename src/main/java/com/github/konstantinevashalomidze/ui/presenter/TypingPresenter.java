@@ -47,10 +47,12 @@ public class TypingPresenter implements TypingViewHandler {
                 typingView.displayAccuracy(typingSession.getAccuracy());
                 typingView.displayErrorCount(typingSession.getErrorCount());
                 if (typingSession.getState() == TypingSession.State.COMPLETED) {
+                    System.out.println(typingSession.getKeyTimestamps());
                     metricsRepository.save(new Metrics(
                             typingSession.getWpm(),
                             typingSession.getAccuracy(),
                             typingSession.getErrorCount(),
+                            typingSession.getKeyTimestamps(),
                             targetText
                     ));
                     metricsTimer.cancel();
@@ -62,7 +64,7 @@ public class TypingPresenter implements TypingViewHandler {
 
     @Override
     public void keyDown(char key) {
-
+        typingSession.keyDown(key);
     }
 
     @Override
