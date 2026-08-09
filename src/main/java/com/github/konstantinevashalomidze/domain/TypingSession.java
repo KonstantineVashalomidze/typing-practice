@@ -13,7 +13,6 @@ import static com.github.konstantinevashalomidze.domain.TypingSession.State.*;
 
 public class TypingSession {
 
-
     public enum CharState {
         CORRECT,
         INCORRECT,
@@ -37,7 +36,7 @@ public class TypingSession {
         this.targetText = targetText;
     }
 
-    public CharState newChar(char c, long timestamp) {
+    public CharState newChar(char c) {
         if (state == COMPLETED) {
             throw new TypingSessionAlreadyCompletedException("Typing session already completed");
         }
@@ -56,7 +55,7 @@ public class TypingSession {
             } else {
                 commonPiece();
                 errorCount++;
-                 return CharState.INCORRECT;
+                return CharState.INCORRECT;
             }
         }
 
@@ -86,6 +85,18 @@ public class TypingSession {
         double elapsedMinutes = (endTimeNanos - startTimeNanos) / 60_000_000_000.;
         int numberOfChars = typedSoFar.size();
         wpm = (Math.max(0, (numberOfChars - errorCount)/ 5.)) / elapsedMinutes;
+    }
+
+    public void deleteWord() {
+        while (!typedSoFar.isEmpty() && !Character.isLetter(typedSoFar.getLast())) {
+            typedSoFar.removeLast();
+            caretPosition--;
+        }
+
+        while (!typedSoFar.isEmpty() && Character.isLetter(typedSoFar.getLast())) {
+            typedSoFar.removeLast();
+            caretPosition--;
+        }
     }
 
     public void keyDown(char key) {

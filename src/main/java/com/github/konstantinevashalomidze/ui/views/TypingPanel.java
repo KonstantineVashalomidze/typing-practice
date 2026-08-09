@@ -8,7 +8,6 @@ import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.List;
 
 public class TypingPanel extends JPanel implements KeyListener, TypingView {
@@ -142,7 +141,11 @@ public class TypingPanel extends JPanel implements KeyListener, TypingView {
 
     @Override
     public void keyTyped(KeyEvent e) {
-        typingViewHandler.keyTyped(e.getKeyChar());
+        if (e.isControlDown() && e.getKeyChar() == '\b') {
+            typingViewHandler.keyTyped(e.getKeyChar(), true);
+        } else {
+            typingViewHandler.keyTyped(e.getKeyChar(), false);
+        }
     }
 
     @Override

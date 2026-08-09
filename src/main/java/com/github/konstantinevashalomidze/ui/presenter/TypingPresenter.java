@@ -5,8 +5,8 @@ import com.github.konstantinevashalomidze.db.MetricsRepository;
 import com.github.konstantinevashalomidze.domain.TypingSession;
 import com.github.konstantinevashalomidze.domain.exceptions.TypingSessionHasNotBeenStartedException;
 import com.github.konstantinevashalomidze.domain.model.Metrics;
-import com.github.konstantinevashalomidze.domain.service.ai.AiTextProvider;
 import com.github.konstantinevashalomidze.domain.service.TextProvider;
+import com.github.konstantinevashalomidze.domain.service.random.RandomTextProvider;
 import com.github.konstantinevashalomidze.domain.view.TypingView;
 import com.github.konstantinevashalomidze.domain.view.TypingViewHandler;
 
@@ -28,7 +28,7 @@ public class TypingPresenter implements TypingViewHandler {
     public TypingPresenter(Config config, MetricsRepository metricsRepository) {
         this.metricsRepository = metricsRepository;
         this.config = config;
-        textProvider = new AiTextProvider(config, metricsRepository, 25);
+        textProvider = new RandomTextProvider(25, 1, 5);
     }
 
     public void createNewSession() {
@@ -47,7 +47,6 @@ public class TypingPresenter implements TypingViewHandler {
                 typingView.displayAccuracy(typingSession.getAccuracy());
                 typingView.displayErrorCount(typingSession.getErrorCount());
                 if (typingSession.getState() == TypingSession.State.COMPLETED) {
-                    System.out.println(typingSession.getKeyTimestamps());
                     metricsRepository.save(new Metrics(
                             typingSession.getWpm(),
                             typingSession.getAccuracy(),
@@ -73,19 +72,29 @@ public class TypingPresenter implements TypingViewHandler {
     }
 
     @Override
-    public void keyTyped(char key) {
+    public void keyTyped(char key, boolean wordDelete) {
         if (typingSession == null) {
             throw new TypingSessionHasNotBeenStartedException("Start new session before typing");
         }
 
         if (typingSession.getState() != TypingSession.State.COMPLETED) {
             int prevCaretPosition = typingSession.getCaretPosition();
-            var charState = typingSession.newChar(key, System.nanoTime());
-            int caretPosition = typingSession.getCaretPosition();
+            if (wordDelete) {
+                typingSession.deleteWord();
+                int caretPosition = typingSession.getCaretPosition();
+                for (int i = caretPosition; i < prevCaretPosition; i++) {
+                    typingView.colorCharAt(i, correctnessToColorMapper(TypingSession.CharState.DEFAULT));
+                }
+                typingView.drawCaretAt(caretPosition);
+            } else {
+                var charState = typingSession.newChar(key);
+                int caretPosition = typingSession.getCaretPosition();
 
-            typingView.colorCharAt(charState == TypingSession.CharState.DEFAULT ? caretPosition
-                    : prevCaretPosition, correctnessToColorMapper(charState));
-            typingView.drawCaretAt(caretPosition);
+                typingView.colorCharAt(charState == TypingSession.CharState.DEFAULT ? caretPosition
+                        : prevCaretPosition, correctnessToColorMapper(charState));
+                typingView.drawCaretAt(caretPosition);
+            }
+
         }
     }
 
