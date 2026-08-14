@@ -1,5 +1,6 @@
 package com.github.konstantinevashalomidze.ui.views;
 
+import com.github.konstantinevashalomidze.MainFrame;
 import com.github.konstantinevashalomidze.domain.view.TypingView;
 import com.github.konstantinevashalomidze.domain.view.TypingViewHandler;
 
@@ -88,9 +89,10 @@ public class TypingPanel extends JPanel implements KeyListener, TypingView {
         String accuracyLocal = String.valueOf((int) accuracy);
         List<String> bottomLabels = List.of(
                 "ctrl + n - new game",
-                " * WPM:", wpmLocal,
-                " * ACCURACY:", accuracyLocal,
-                " * ERRORS:", String.valueOf(errorCount));
+                " | ctrl + s - settings",
+                " | WPM:", wpmLocal,
+                " | ACCURACY:", accuracyLocal,
+                " | ERRORS:", String.valueOf(errorCount));
         int drawingX = MARGIN_X;
         for (String bottomLabel : bottomLabels) {
             g2d.drawString(bottomLabel, drawingX,
@@ -156,7 +158,9 @@ public class TypingPanel extends JPanel implements KeyListener, TypingView {
     @Override
     public void keyReleased(KeyEvent e) {
         if (e.isControlDown() && e.getKeyCode() == KeyEvent.VK_N) {
-            typingViewHandler.newSession();
+            typingViewHandler.keyUp(e.getKeyChar(), "ctrln");
+        } else if (e.isControlDown() && e.getKeyCode() == KeyEvent.VK_S) {
+            typingViewHandler.keyUp(e.getKeyChar(), "ctrls");
         }
     }
 }

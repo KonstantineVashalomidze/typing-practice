@@ -9,6 +9,8 @@ import com.github.konstantinevashalomidze.domain.service.TextProvider;
 import com.github.konstantinevashalomidze.domain.service.fallback.FallbackTextProvider;
 import com.github.konstantinevashalomidze.domain.view.TypingView;
 import com.github.konstantinevashalomidze.domain.view.TypingViewHandler;
+import com.github.konstantinevashalomidze.ui.Navigator;
+import com.github.konstantinevashalomidze.ui.views.SettingsPanel;
 
 import java.awt.*;
 import java.util.Timer;
@@ -23,9 +25,11 @@ public class TypingPresenter implements TypingViewHandler {
     private TypingSession typingSession;
     private final MetricsRepository metricsRepository;
     private Timer metricsTimer;
+    private final Navigator navigator;
 
-    public TypingPresenter(Config config, MetricsRepository metricsRepository) {
+    public TypingPresenter(Config config, Navigator navigator, MetricsRepository metricsRepository) {
         this.metricsRepository = metricsRepository;
+        this.navigator = navigator;
         textProvider = new FallbackTextProvider(config, metricsRepository);
     }
 
@@ -65,8 +69,15 @@ public class TypingPresenter implements TypingViewHandler {
     }
 
     @Override
-    public void keyUp(char key) {
-
+    public void keyUp(char key, String event) {
+        if (event != null) {
+            switch (event) {
+                case "ctrls" -> {
+                    navigator.navigateTo(SettingsPanel.class.getSimpleName());
+                }
+                case "ctrln" -> createNewSession();
+            }
+        }
     }
 
     @Override
@@ -94,11 +105,6 @@ public class TypingPresenter implements TypingViewHandler {
             }
 
         }
-    }
-
-    @Override
-    public void newSession() {
-        createNewSession();
     }
 
     private Color correctnessToColorMapper(TypingSession.CharState charState) {
