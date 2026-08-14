@@ -6,8 +6,7 @@ import com.github.konstantinevashalomidze.domain.TypingSession;
 import com.github.konstantinevashalomidze.domain.exceptions.TypingSessionHasNotBeenStartedException;
 import com.github.konstantinevashalomidze.domain.model.Metrics;
 import com.github.konstantinevashalomidze.domain.service.TextProvider;
-import com.github.konstantinevashalomidze.domain.service.TextProviderFactory;
-import com.github.konstantinevashalomidze.domain.service.random.RandomTextProvider;
+import com.github.konstantinevashalomidze.domain.service.fallback.FallbackTextProvider;
 import com.github.konstantinevashalomidze.domain.view.TypingView;
 import com.github.konstantinevashalomidze.domain.view.TypingViewHandler;
 
@@ -27,7 +26,7 @@ public class TypingPresenter implements TypingViewHandler {
 
     public TypingPresenter(Config config, MetricsRepository metricsRepository) {
         this.metricsRepository = metricsRepository;
-        textProvider = TextProviderFactory.createTextProvider(config, metricsRepository);
+        textProvider = new FallbackTextProvider(config, metricsRepository);
     }
 
     public void createNewSession() {
