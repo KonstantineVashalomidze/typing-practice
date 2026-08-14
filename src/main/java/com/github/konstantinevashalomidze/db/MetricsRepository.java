@@ -29,8 +29,10 @@ public class MetricsRepository {
         collection.insertOne(metrics);
     }
 
-    public List<Metrics> findAll() {
-        return collection.find().into(new ArrayList<>());
+    public List<Metrics> findN(int n) {
+        return collection.find().limit(n).into(new ArrayList<>());
     }
+
+
 
 }
