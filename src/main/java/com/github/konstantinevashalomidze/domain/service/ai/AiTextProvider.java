@@ -6,24 +6,30 @@ import com.github.konstantinevashalomidze.domain.model.Metrics;
 import com.github.konstantinevashalomidze.domain.service.TextProvider;
 import com.google.genai.Client;
 import com.google.genai.types.GenerateContentResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class AiTextProvider implements TextProvider {
+    private final Logger logger = LoggerFactory.getLogger(AiTextProvider.class);
     private final Client client;
     private final Config config;
     private final int numberOfWords;
     private final MetricsRepository metricsRepository;
+    private final Deque<String> targetTexts;
 
     public AiTextProvider(Config config, MetricsRepository metricsRepository, int numberOfWords) {
         this.config = config;
         this.numberOfWords = numberOfWords;
         this.metricsRepository = metricsRepository;
-
         client = Client.builder()
                 .apiKey(config.genaiApiKey())
                 .build();
+        var unshuffled = metricsRepository.findN(3).stream().map(Metrics::targetText).collect(Collectors.toList());
+        Collections.shuffle(unshuffled);
+        targetTexts = new LinkedList<>(unshuffled);
     }
 
 
@@ -62,8 +68,7 @@ public class AiTextProvider implements TextProvider {
         return strugglingPairs;
     }
 
-    @Override
-    public String getText() {
+    private void fillTheQueue() {
         List<String> hesitationPairs = determineHesitatedCharPairs();
         GenerateContentResponse response =
                 client.models.generateContent(
@@ -72,9 +77,28 @@ public class AiTextProvider implements TextProvider {
                                 .formatted(
                                         numberOfWords,
                                         hesitationPairs
-                                        ),
+                                ),
                         null
                 );
-        return response.text();
+
+        targetTexts.offer(response.text());
+        logger.info("fetched text %s".formatted(response.text()));
+    }
+
+    @Override
+    public String getText() {
+        if (targetTexts.isEmpty()) {
+            fillTheQueue();
+        }
+
+        String text = targetTexts.poll();
+        Thread.ofVirtual().start(() -> {
+            if (targetTexts.size() < 2) {
+                fillTheQueue();
+                fillTheQueue();
+                fillTheQueue();
+            }
+        });
+        return text;
     }
 }
